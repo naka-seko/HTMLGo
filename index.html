@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ja">
+<!-- HTMLの言語を日本語に設定 -->
+<head>
+    <meta charset="UTF-8">
+    <!-- 文字エンコーディングをUTF-8に設定 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カレンダー作成</title>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif; /* フォントを設定 */
+        background-color: #b9a9a9ff; /* 背景色を設定 */
+        color: #333; /* 文字色を設定 */
+        padding: 20px; /* パディングを追加 */
+    }
+    h1 {
+        text-align: center; /* タイトルを中央揃え */
+        color: #962424ff; /* タイトルの色を設定 */
+        margin-bottom: 20px; /* タイトルとフォームの間隔 */
+        font-size: 2.5em; /* タイトルのフォントサイズを大きく */
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1); /* タイトルに影を追加 */
+    }
+    form {
+        max-width: 400px; /* フォームの最大幅を設定 */
+        margin: auto; /* フォームを中央に配置 */
+        background-color: #fff; /* フォームの背景色 */
+        padding: 20px; /* フォーム内のパディング */
+        border-radius: 8px; /* 角を丸くする */
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1); /* ボックスシャドウ */
+    }
+    label {
+        display: block; /* ラベルをブロック要素にする */
+        margin-bottom: 10px; /* ラベルと入力の間隔 */
+    }
+    /* 年月タイトルのスタイル */
+    .title {
+        font-size: 24px; /* 文字サイズを大きくする */
+        font-weight: bold; /* 強調表示 */
+        text-align: left; /* 左揃え */
+        color: #4CAF50; /* 緑系の爽やかな色 */
+        background-color: #f0f8ff; /* 背景色を淡い青に */
+        padding: 10px; /* 余白を追加 */
+        border-radius: 8px; /* 角を丸くする */
+    }
+    button {
+        display: block; /* ボタンをブロック要素にする */
+        width: 100%; /* ボタンの幅を100%にする */
+        padding: 10px; /* ボタンのパディング */
+        background-color: #007bff; /* ボタンの背景色 */
+        color: white; /* ボタンの文字色 */
+        border: none; /* ボーダーなし */
+        border-radius: 4px; /* ボタンの角を丸くする */
+        cursor: pointer; /* カーソルをポインターに変更 */
+    }
+    button:hover {
+        background-color: #0056b3; /* ホバー時の背景色変更 */
+        transition: background-color 0.3s ease; /* ホバー時のアニメーション */
+    }
+    select {
+        display: inline-block; /* セレクトボックスをインラインブロックにする */
+        margin-right: 50px; /* セレクトボックスの間隔を調整 */
+        color: #000508ff;
+        font-family: Arial, sans-serif; /* フォントを設定 */
+        font-size: 16px; /* 文字サイズを変更 */
+        width: 150px;    /* 幅を調整 */
+        height: 30px;    /* 高さを調整 */
+        padding: 5px;    /* パディングを追加 */
+        border: 1px solid #ccc; /* ボーダーを追加 */
+    }
+    div#output-section {
+        width: 50%; /* カレンダーの幅を50%に設定 */
+        max-width: 800px; /* 最大幅を800pxに制限 */
+        margin: 0 auto; /* 左右中央揃え */
+        padding: 10px; /* パディングを追加 */
+        background-color: rgb(218, 205, 205); /* 出力セクションの背景色 */
+        border: 1px solid #e0d9d9; /* ボーダーを追加 */
+        border-radius: 5px; /* 角を丸くする */
+    }
+    /* 先頭行（日曜日）を赤に */
+    table th:nth-child(1) {
+        color: red;
+        font-weight: bold; /* 文字を強調 */
+    }
+
+    /* 先頭行（土曜日）を青に */
+    table th:nth-child(7) {
+        color: blue;
+        font-weight: bold; /* 文字を強調 */
+    }
+    /* 日曜日のセルのスタイル */
+    table td:nth-child(1) {
+        color: red;
+        font-weight: bold;
+        background-color: #ffe6e6; /* 日曜日の背景色（薄い赤） */
+    }
+    /* 土曜日のセルのスタイル */
+    table td:nth-child(7) {
+        color: blue;
+        font-weight: bold;
+        background-color: #e6f7ff; /* 土曜日の背景色（薄い青） */
+    }
+</style>
+<body>
+    <h1>カレンダー作成</h1>
+    <!-- 年月選択フォーム -->
+    <form id="calendar-form">
+        <div class="title">年</div>
+        <select id="year" name="year">
+            <!-- JavaScriptで年範囲を追加 -->
+        </select>
+
+        <br>
+        <div class="title">月</div>
+        <select id="month" name="month">
+            <!-- JavaScriptで月範囲を追加 -->
+        </select>
+
+        <br><br>
+        <button id="generate-calendar" type="button">作成します‼</button>
+    </form>
+
+    <!-- カレンダーの表示セクション -->
+    <div id="output-section"></div>
+        <!-- ここにカレンダーを表示 -->
+
+    <!-- JavaScriptファイルの読み込み -->
+    <script src="calendar.js"></script>
+
+</body>
+</html>
