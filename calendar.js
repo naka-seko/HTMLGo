@@ -43,9 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("エラー発生:", error);
         }
     });
-
-    // 初回表示
-    createButton.click();
 });
 
 /**
