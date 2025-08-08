@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Suika Wari Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="suika_wari.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background: #f0f8ff; }
+        button { margin: 10px; padding: 15px; font-size: 16px; cursor: pointer; }
+        #game-log { margin-top: 20px; border: 1px solid #ddd; padding: 10px; max-height: 200px; overflow-y: scroll; background: #fff; }
+    </style>
+</head>
+<body>
+    <h1>スイカ割りゲーム</h1>
+    <button id="startBtn">ゲーム開始</button>
+    <div id="game-area" style="display:none;">
+        <button id="btn-n">北へ移動</button>
+        <button id="btn-s">南へ移動</button>
+        <button id="btn-e">東へ移動</button>
+        <button id="btn-w">西へ移動</button>
+        <button id="btn-restart" style="display:none;">もう一度遊ぶ</button>
+        <div id="game-log"></div>
+    </div>
+    <script>
+        document.getElementById('startBtn').addEventListener('click', function() {
+            if (typeof startGame === 'function') {
+                startGame();
+            }
+        });
+    </script>
+</body>
+</html>
