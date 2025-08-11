@@ -2,26 +2,115 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <!-- タイトル -->
     <title>Suika Wari Game</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- スクリプトの読み込み -->
     <script src="suika_wari.js"></script>
+    <!-- スタイルの定義 -->
     <style>
         body { font-family: Arial, sans-serif; text-align: center; background: #f0f8ff; }
         button { margin: 10px; padding: 15px; font-size: 16px; cursor: pointer; }
         #game-log { margin-top: 20px; border: 1px solid #ddd; padding: 10px; max-height: 200px; overflow-y: scroll; background: #fff; }
+        #game-area { margin-top: 20px; }
+
+        /* ダークモード用CSS */
+        body {
+            background-color: #121212; /* 深い黒を背景に */
+            color: #ffffff; /* テキストは白で */
+        }
+
+        /* タイトルのスタイル */
+        .title {
+            font-size: 36px; /* タイトルを大きく見せる */
+            color: #FF4500; /* 視認性の高いオレンジ色にする */
+            font-weight: bold; /* 太字で強調する */
+            text-align: center; /* 中央に配置する */
+            text-shadow: 2px 2px #000; /* シャドウ効果でさらに目立たせる */
+        }
+
+        /* ボタンのスタイル */
+        .start-button {
+            background-color: #32CD32; /* 鮮やかな緑色で元気な印象に */
+            color: white; /* テキストを白にしてコントラストを強調 */
+            font-size: 20px; /* ボタンのテキストを少し大きく */
+            font-weight: bold; /* テキストを太字に */
+            padding: 10px 20px; /* ボタンのサイズを調整 */
+            border: none; /* ボーダーをなくしてすっきり */
+            border-radius: 5px; /* 角を丸くして親しみやすく */
+            cursor: pointer; /* カーソルをポインターに */
+            box-shadow: 2px 2px 5px #888; /* シャドウで少し立体感を追加 */
+        }
+        .start-button:hover {
+            background-color: #228B22; /* ホバー時に少し濃い緑色に変化 */
+            transform: scale(1.05); /* ボタンが少し拡大するアニメーションを追加 */
+        }
+
+        /* 移動ボタンのスタイル */
+        .move-button {
+            background-color: #ADD8E6; /* 薄い青色で爽やかな印象に */
+            color: rgb(15, 14, 14); /* 白文字で読みやすく */
+            font-size: 18px; /* 少し大きめでしっかり表示 */
+            font-weight: bold; /* 太字で注目を集める */
+            padding: 10px 15px; /* ボタンサイズを広めに */
+            border: none; /* ボーダーなしでシンプル */
+            border-radius: 5px; /* 角を丸くして親しみやすく */
+            cursor: pointer; /* クリックできる感覚を演出 */
+            box-shadow: 2px 2px 4px #888; /* シャドウで立体感を追加 */
+        }
+        .move-button:hover {
+            background-color: #87CEFA; /* ホバー時に少し濃い青色に変化 */
+            transform: scale(1.05); /* ボタンが少し拡大するアニメーションを追加 */
+        }
+
+        /* リトライボタンのスタイル */
+        .retry-button {
+            background-color: #FFA07A; /* サーモンピンクで柔らかく目立つ */
+            color: white; /* 白文字で読みやすく */
+            font-size: 20px; /* 少し大きめでしっかり表示 */
+            font-weight: bold; /* 太字で注目を集める */
+            padding: 12px 20px; /* ボタンサイズを広めに */
+            border: none; /* ボーダーなしでシンプル */
+            border-radius: 10px; /* より丸みを帯びたデザインに */
+            cursor: pointer; /* クリックできる感覚を演出 */
+            box-shadow: 3px 3px 6px #888; /* シャドウで立体感を追加 */
+        }
+        .retry-button:hover {
+            background-color: #FF7F50; /* ホバー時に鮮やかさをプラス */
+            transform: scale(1.1); /* ボタンが少し拡大して目を引く */
+        }
+
+        /* ログの背景を調整 */
+        .log-container {
+            background-color: hsl(0, 0%, 18%); /* 優しいダークグレーの背景 */
+            color: lch(51.91% 22.76 22.15); /* 明るいグレーの文字色でコントラストを確保 */
+            font-size: 36px; /* 読みやすいフォントサイズ */
+            padding: 10px; /* 余白を追加して見やすく */
+            border-radius: 5px; /* 少し丸みをつけて柔らかい印象に */
+            overflow-y: auto; /* コンテンツが多い場合、縦スクロールを許可 */
+            max-height: 1000px; /* 高さを制限してUIを整える */
+            border: 1px solid #ccc; /* 見た目の確認にも役立つ */
+        }
     </style>
 </head>
+
 <body>
-    <h1>スイカ割りゲーム</h1>
-    <button id="startBtn">ゲーム開始</button>
+    <!-- ゲームタイトル -->
+    <h1 class="title">スイカ割りゲーム</h1>
+    <!-- ゲーム開始ボタン -->
+    <button id="startBtn" class="start-button">ゲーム開始！</button>
+    <!-- ゲームエリアとログ表示 -->
     <div id="game-area" style="display:none;">
-        <button id="btn-n">北へ移動</button>
-        <button id="btn-s">南へ移動</button>
-        <button id="btn-e">東へ移動</button>
-        <button id="btn-w">西へ移動</button>
-        <button id="btn-restart" style="display:none;">もう一度遊ぶ</button>
-        <div id="game-log"></div>
+        <button id="btn-n" class="move-button">北へ移動</button>
+        <button id="btn-s" class="move-button">南へ移動</button>
+        <button id="btn-e" class="move-button">東へ移動</button>
+        <button id="btn-w" class="move-button">西へ移動</button>
+        <!-- リトライボタン -->
+        <button id="btn-restart" style="display:none;" class="retry-button">もう一度遊ぶ</button>
+        <!-- ゲームログ表示エリア -->
+        <div id="game-log" class="log-container"></div>
     </div>
+    <!-- スクリプトの読み込みとイベントリスナーの設定 -->
     <script>
         document.getElementById('startBtn').addEventListener('click', function() {
             if (typeof startGame === 'function') {

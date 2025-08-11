@@ -48,8 +48,11 @@ function move(direction) {
         enableButtons(false);
         document.getElementById('btn-restart').style.display = "";
     } else {
+        log.innerHTML += `<p>現在位置: (${playerPos.x}, ${playerPos.y})</p>`;
         log.innerHTML += `<p>スイカへの距離: ${distance} m</p>`;
     }
+    // ログを自動スクロール
+    autoScrollLog();
 }
 
 // ボタンの有効/無効
@@ -72,4 +75,12 @@ window.onload = function() {
     document.getElementById('btn-e').onclick = () => move('e');
     document.getElementById('btn-w').onclick = () => move('w');
     document.getElementById('btn-restart').onclick = restartGame;
-};
+}
+
+// ログを自動スクロールする関数
+function autoScrollLog() {
+    const logContainer = document.querySelector('.log-container'); // クラスセレクターを使用
+    if (logContainer) { // logContainerがnullでない場合に処理を実行
+        logContainer.scrollTop = logContainer.scrollHeight;
+    }
+}
