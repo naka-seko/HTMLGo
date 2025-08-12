@@ -1,38 +1,74 @@
-// game/suuji_answer.go
-// 数字当てゲーム
-// プレイヤーは1から100の間の数字を当てるゲーム。
-// プレイヤーは数字を入力し、正解かどうかをフィードバックされる。
-// 正解するまで繰り返す。
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
+	"net/http"
+	"sync"
 	"time"
 )
 
-func main() {
-	fmt.Println("ようこそ。数字当てゲームへ！")
-	rand.Seed(time.Now().UnixNano())
-	numberToGuess := rand.Intn(100) + 1
-	attempts := 0
+var (
+	numberToGuess int
+	attempts      int
+	mu            sync.Mutex
+)
 
-	for {
-		var guess int
-		fmt.Print("１から１００の間で入力してね: ")
-		_, err := fmt.Scanln(&guess)
-		if err != nil {
-			fmt.Println("数字（整数）を入れてください。")
-			continue
-		}
-		attempts++
-		if guess < numberToGuess {
-			fmt.Println("小さいです！")
-		} else if guess > numberToGuess {
-			fmt.Println("大きいです！")
-		} else {
-			fmt.Printf("🎊ございます！ 入力された回数は %d です。\n", attempts)
-			break
-		}
+type GuessRequest struct {
+	Guess int `json:"guess"`
+}
+
+type GuessResponse struct {
+	Result   string `json:"result"`
+	Attempts int    `json:"attempts"`
+}
+
+// 数字当てゲームのメイン関数
+func main() {
+	rand.Seed(time.Now().UnixNano())
+	resetGame()
+
+	http.HandleFunc("/guess", guessHandler)
+	http.Handle("/", http.FileServer(http.Dir(".")))
+
+	// サーバーのポートを8080に設定
+	fmt.Println("サーバーがhttp://localhost:8080で起動中...")
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		fmt.Printf("サーバー起動エラー: %v\n", err)
 	}
+}
+
+func resetGame() {
+	mu.Lock()
+	defer mu.Unlock()
+	numberToGuess = rand.Intn(100) + 1
+	attempts = 0
+}
+
+func guessHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POSTのみ許可されています", http.StatusMethodNotAllowed)
+		return
+	}
+	var req GuessRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "リクエストが不正です", http.StatusBadRequest)
+		return
+	}
+	mu.Lock()
+	attempts++
+	var result string
+	if req.Guess < numberToGuess {
+		result = "小さいです！"
+	} else if req.Guess > numberToGuess {
+		result = "大きいです！"
+	} else {
+		result = fmt.Sprintf("🎊ございます！ 入力された回数は %d です。", attempts)
+		resetGame()
+	}
+	mu.Unlock()
+	resp := GuessResponse{Result: result, Attempts: attempts}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp)
 }
