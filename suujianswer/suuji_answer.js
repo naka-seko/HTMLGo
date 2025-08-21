@@ -1,5 +1,3 @@
-let playerPos, suikaPos;
-
 // ゲーム開始
 function startGame() {
     document.getElementById('startBtn').style.display = "none";
@@ -7,9 +5,10 @@ function startGame() {
     document.getElementById('game-area').style.display = "";
     document.getElementById('user-input-area').style.display = "block";
     document.getElementById('user-input').style.display = "inline-block";
+    document.getElementById("user-input").focus();
     document.getElementById('submitGuess').style.display = "inline-block";
-    document.getElementById('game-log').innerHTML = "";
     document.getElementById('btn-restart').style.display = "none";
+    document.getElementById('game-log').innerHTML = "";
 }
 
 // 数字当てゲーム実行
@@ -27,6 +26,7 @@ async function submitGuess() {
         updateGameLog("1から100の数字を入力して下さい。");
         return;
     }
+
     try {
         const res = await fetch('/guess', {
             method: 'POST',
@@ -35,15 +35,26 @@ async function submitGuess() {
         });
         const data = await res.json();
         updateGameLog(data.result);
-        console.log(data);
+        // 正解の場合
         if (data.result.includes("ございます")) {
+            document.getElementById('submitGuess').style.display = "none";
             document.getElementById('btn-restart').style.display = "";
-            document.getElementById('guessBtn').disabled = true;
-            document.getElementById('guessInput').disabled = true;
         }
     } catch (e) {
         updateGameLog("通信エラー");
     }
+}
+
+// ゲーム再スタート
+function restartGame() {
+    document.getElementById('game-area').style.display = "";
+    document.getElementById('user-input-area').style.display = "block";
+    document.getElementById('user-input').value = '';
+    document.getElementById('user-input').style.display = "";
+    document.getElementById("user-input").focus();
+    document.getElementById('submitGuess').style.display = "inline-block";
+    document.getElementById('btn-restart').style.display = "none";
+    document.getElementById('game-log').innerHTML = "";
 }
 
 // メッセージログ出力
@@ -55,14 +66,6 @@ function updateGameLog(message) {
     autoScrollLog();
 }
 
-// ゲーム再スタート
-function restartGame() {
-    document.getElementById('guessBtn').disabled = false;
-    document.getElementById('guessInput').disabled = false;
-    document.getElementById('game-log').textContent = "";
-    document.getElementById('guessInput').value = "";
-    document.getElementById('restartBtn').style.display = "none";
-}
 // ログを自動スクロールする関数
 function autoScrollLog() {
     const logContainer = document.querySelector('log-container'); // クラスセレクターを使用
