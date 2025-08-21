@@ -39,6 +39,7 @@ func main() {
 	}
 }
 
+    // ゲームリセット処理
 func resetGame() {
 	mu.Lock()
 	defer mu.Unlock()
@@ -46,16 +47,19 @@ func resetGame() {
 	attempts = 0
 }
 
+    //結果ハンドル処理
 func guessHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "POSTのみ許可されています", http.StatusMethodNotAllowed)
 		return
 	}
+
 	var req GuessRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "リクエストが不正です", http.StatusBadRequest)
 		return
 	}
+    // 回数アップ＆数字判定
 	mu.Lock()
 	attempts++
 	var result string
@@ -65,9 +69,12 @@ func guessHandler(w http.ResponseWriter, r *http.Request) {
 		result = "大きいです！"
 	} else {
 		result = fmt.Sprintf("🎊ございます！ 入力された回数は %d です。", attempts)
-		resetGame()
+		numberToGuess = rand.Intn(100) + 1
+		attempts = 0
 	}
 	mu.Unlock()
+
+    // サーバーのポートを8080に設定
 	resp := GuessResponse{Result: result, Attempts: attempts}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
