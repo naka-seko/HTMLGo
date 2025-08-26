@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>果物辞書</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        input, button { margin: 0.5em; }
+        #result { margin-top: 1em; }
+    </style>
+</head>
+<body>
+    <h1>果物辞書ツール（履歴無）</h1>
+    <div>
+        <input type="text" id="word" placeholder="英単語">
+        <input type="text" id="meaning" placeholder="日本語の意味">
+        <button onclick="search()">検索</button>
+        <button onclick="save()">追加/更新</button>
+        <button onclick="del()">削除</button>
+    </div>
+    <div id="result"></div>
+    <script>
+        function api(action) {
+            const word = document.getElementById('word').value.trim();
+            const meaning = document.getElementById('meaning').value.trim();
+            fetch('/api', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action, word, meaning })
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('result').textContent = data.message;
+            });
+        }
+        function search() { api('search'); }
+        function save() { api('save'); }
+        function del() { api('delete'); }
+    </script>
+</body>
+</html>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .dark-mode {
+            background-color: #333;
+            color: #fff;
+        }
+        input, button {
+            margin: 5px;
+            padding: 8px;
+            border-radius: 5px; /* 丸みを追加 */
+            border: 1px solid #ddd;
+            box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+        }
+        input:focus, button:focus {
+            outline: none; 
+            border-color: #f88; 
+            box-shadow: 0 0 10px #ffab91; /* フォーカス時の効果 */
+        }
+        .result { margin-top: 20px; }
+        button:hover {
+            background-color: #ffab91; /* 明るい背景色 */
+            color: #fff; /* ホバーテキスト色 */
+            transform: scale(1.1); /* 拡大効果 */
+            transition: 0.3s ease; /* スムーズなアニメーション */
+        }
+        .result.success {
+            color: #2e7d32; /* 濃い緑色 */
+            border: 2px solid #66bb6a;
+            background-color: #e8f5e9;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .result.error {
+            color: #c62828; /* 濃い赤色 */
+            border: 2px solid #ef5350;
+            background-color: #ffebee;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: linear-gradient(to right, #ffecd2, #fcb69f); /* 背景グラデーション */
+            color: #333;
+        }
+        #historyContainer {
+            display: block; /* 確実に表示 */
+        }
+        #historyTitle {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            text-align: left; /* 左寄せ */
+        }
+        .history-item {
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+        }
+        .history-item:hover {
+            background-color: #f0f0f0;
+            color: #333;
+            transition: 0.2s ease;
+        }
+    </style>
+</head>
+<body>
+    <h2>🍎 果物辞書ツール（履歴有）</h2>
+    <div style="text-align: right; margin-bottom: 20px;">
+        <button onclick="toggleDarkMode()">ダークモード切替</button>
+    </div>
+    <input type="text" id="searchBox" placeholder="例: apple">
+    <button onclick="searchWord()">検索</button>
+    <button onclick="deleteWord()">削除</button>
+    <input type="text" id="meaningBox" lang="ja" placeholder="日本語">
+    <button onclick="saveWord()">保存</button>
+
+    <div class="result" id="output"></div>
+    <div id="historyContainer" style="margin-top: 20px; padding: 10px; background-color: #f7f7f7; border: 1px solid #ddd;">
+        <h4 id="historyTitle" style="margin-bottom: 10px;">検索履歴</h4>
+        <div id="historyItems"></div> <!-- 履歴のアイテムがここに追加される -->
+    </div>
+    <button onclick="clearHistory()">履歴クリア</button>
+
+    <script>
+
+        function toggleDarkMode() {
+            const isDarkMode = document.body.classList.toggle("dark-mode");
+            localStorage.setItem("darkMode", isDarkMode ? "enabled" : "disabled");
+            searchBox.focus(); // 検索ボックスに再フォーカス
+        }
+
+        window.onload = function () {
+            if (localStorage.getItem("darkMode") === "enabled") {
+                document.body.classList.add("dark-mode");
+            }
+            displayHistory(); // ページロード時に履歴を表示
+            searchBox.focus(); // 検索ボックスにフォーカス
+        };
+
+        document.getElementById("meaningBox").addEventListener("focus", () => {
+            meaningBox.lang = 'ja';
+        });
+        document.getElementById("meaningBox").addEventListener("blur", () => {
+            meaningBox.lang = 'en';
+        });
+
+        async function requestToPHP(action, word, meaning = "") {
+            const output = document.getElementById("output");
+            output.textContent = "🍄 データを処理中です。少々お待ちください...";
+            try {
+                const res = await fetch("api.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action, word, meaning })
+                });
+                if (!res.ok) {
+                    throw new Error(`サーバーエラー: ${res.status}`);
+                }
+                const data = await res.json();
+                output.textContent = data.message; // 処理完了
+                return data;
+            } catch (err) {
+                output.textContent = `エラーが発生しました: ${err.message}`;  // エラー時
+                console.error("エラー:", err);
+                throw Error;
+            }
+        }
+
+        document.getElementById("searchBox").addEventListener("keypress", function (event) {
+            if (event.key === "Enter") { // Enterキーが押されたか判定
+                searchWord(); // 検索関数を呼び出す
+            }
+        });
+
+        document.getElementById("meaningBox").addEventListener("keypress", function (event) {
+            if (event.key === "Enter") { // Enterキーが押されたか判定
+                saveWord(); // 保存関数を呼び出す
+            }
+        });
+
+        function addToHistory(word) {
+            if (!word) return; // 空の単語は無視
+
+            let history = JSON.parse(localStorage.getItem("history")) || []; // 履歴を取得
+            if (!history.includes(word)) { // 重複を防ぐ
+                history.push(word); // 履歴に追加
+                localStorage.setItem("history", JSON.stringify(history)); // 保存
+            }
+        }
+
+        function displayHistory() {
+            const historyItems = document.getElementById("historyItems");
+            const history = JSON.parse(localStorage.getItem("history")) || [];
+            historyItems.innerHTML = ""; // 履歴アイテムだけをリセット
+
+            history.forEach(word => {
+                const listItem = document.createElement("div");
+                listItem.textContent = word;
+                listItem.className = "history-item";
+                historyItems.appendChild(listItem);
+            });
+        }
+
+        function clearHistory() {
+            localStorage.removeItem("history");
+            displayHistory(); // 履歴を更新
+            searchBox.focus(); // 検索ボックスに再フォーカス
+        }
+
+        async function searchWord() {
+            const searchBox = document.getElementById("searchBox"); // 検索ボックスの取得
+            const meaningBox = document.getElementById("meaningBox"); // 日本語ボックスの取得
+            const word = searchBox.value.trim(); // トリムして空白を除去
+            if (!word) { // wordが空の場合
+                const output = document.getElementById("output");
+                output.textContent = "必要な単語を入力して下さい。";
+                searchBox.focus(); // 検索ボックスに再フォーカス
+                return; // 処理を中断
+            }
+
+            try {
+                const response = await requestToPHP("search", word, "");
+
+                if (response.status === "success") {
+                    document.getElementById("output").textContent = response.message; // 結果を表示
+                    addToHistory(word); // 履歴に追加
+                    displayHistory(); // 履歴を更新
+                    searchBox.focus(); // 検索ボックスに再フォーカス
+                } else {
+                    document.getElementById("output").textContent = response.message; // データ無し表示
+                    meaningBox.focus(); // 日本語入力欄にフォーカス
+                }
+            } catch (err) {
+                output.textContent = `エラーが発生しました: ${err.message}`;  // エラー時
+                console.error("PHPリクエスト中にエラーが発生しました:", err);
+                searchBox.focus(); // 検索ボックスに再フォーカス
+            }
+        }
+
+        function deleteWord() {
+            const searchBox = document.getElementById("searchBox"); // 検索ボックスの取得
+            const word = searchBox.value.trim(); // トリムして空白を除去
+
+            if (!word) { // wordが空の場合
+                const output = document.getElementById("output");
+                output.textContent = "必要な単語を入力して下さい。";
+            } else {
+                requestToPHP("delete", word, "");
+                searchBox.value = ''; // 検索の文字を削除
+            }
+
+            searchBox.focus(); // 検索にフォーカス
+        }
+
+        function saveWord() {
+            const searchBox = document.getElementById("searchBox"); // 検索ボックスの取得
+            const word = searchBox.value.trim(); // トリムして空白を除去
+            const meaningBox = document.getElementById("meaningBox"); // 日本語の取得
+            const meaning = meaningBox.value.trim(); // トリムして空白を除去
+
+            if (!word || !meaning) { // word,meaningが空の場合
+                const output = document.getElementById("output");
+                output.textContent = "保存する英単語と日本語を入力して下さい。";
+            } else {
+                requestToPHP("save", word, meaning); // データ送信
+                meaningBox.value = ''; // 日本語の文字を削除
+            }
+
+            searchBox.focus(); // 検索にフォーカス
+        }
+
+    </script>
+</body>
+</html>
