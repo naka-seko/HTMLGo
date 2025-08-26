@@ -1,0 +1,4 @@
+orange,みかん
+peach,もも
+grape,ぶどう
+apple,りんご
